@@ -8,11 +8,13 @@ from src.gpt_filter import filter_documents_with_gpt
 from src.scoring import score_documents
 from src.selection import select_top_15
 
-# 1. Charger les variables d’environnement
-
 
 # 2. Nettoyage des apostrophes et guillemets
 def clean_question(text):
+    """
+    Nettoie les apostrophes et guillemets typographiques pour éviter 
+    les erreurs de parsing ou d'encodage dans les appels API.
+    """
     return text.replace("’", "'").replace("“", '"').replace("”", '"')
 
 # 3. Liste des 11 questions cliniques nettoyées
@@ -63,7 +65,7 @@ for question in QUESTIONS:
     print(f"→ {len(filtered_docs)} documents jugés pertinents")
 
     if not filtered_docs:
-        print("⚠️ Aucun document pertinent à scorer pour cette question.")
+        print(" Aucun document pertinent à scorer pour cette question.")
         continue
 
     # d. Scoring + sélection

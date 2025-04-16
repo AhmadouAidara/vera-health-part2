@@ -1,6 +1,16 @@
 import pandas as pd
 
 def load_journals(filepath: str) -> pd.DataFrame:
+    """
+    Charge un fichier brut contenant des informations sur des journaux scientifiques
+    (Journal, SJR, Quartile) et les convertit en un DataFrame structuré.
+
+    Args:
+        filepath (str): Chemin vers le fichier .ts à parser.
+
+    Returns:
+        pd.DataFrame: Un DataFrame avec les colonnes 'journal', 'sjr', et 'quartile'.
+    """
     with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -30,6 +40,17 @@ def load_journals(filepath: str) -> pd.DataFrame:
 
 
 def merge_journal_metadata(documents, journal_df):
+    """
+    Enrichit les documents avec les informations bibliométriques du journal (SJR, Quartile)
+    si le nom du journal du document correspond à une entrée du DataFrame.
+
+    Args:
+        documents (list): Liste de documents ZeroEntropy (chaque document possède .journal et .metadata).
+        journal_df (pd.DataFrame): DataFrame contenant les colonnes 'journal', 'sjr', et 'quartile'.
+
+    Returns:
+        list: Liste des documents mis à jour avec les nouvelles métadonnées (dans .metadata).
+    """
     updated_docs = []
     for doc in documents:
         doc_journal = getattr(doc, "journal", "").strip().lower()

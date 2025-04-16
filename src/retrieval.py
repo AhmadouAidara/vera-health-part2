@@ -7,6 +7,10 @@ from zeroentropy import ZeroEntropy
 zclient = ZeroEntropy(api_key=os.getenv("ZEROENTROPY_API_KEY"))
 print(f"API KEY Loaded: {os.getenv('ZEROENTROPY_API_KEY')}")
 def get_zclient():
+    """
+    Initialise un client ZeroEntropy avec la clé d'API stockée dans l’environnement.
+    Soulève une erreur si la variable n’est pas définie.
+    """
     import os
     from zeroentropy import ZeroEntropy
     api_key = os.getenv("ZEROENTROPY_API_KEY")
@@ -16,6 +20,12 @@ def get_zclient():
 
 
 def query_zero_entropy(question, k=50):
+    """
+    Envoie une requête à ZeroEntropy avec un filtre strict :
+    - Le document est une guideline (is_guidelines = true)
+    - Il a au moins 10 citations
+    - Il a au moins 2 citations influentes
+    """
     zclient = get_zclient()
     response = zclient.queries.top_documents(
         collection_name="VeraScientia-HighThroughput",
@@ -34,12 +44,24 @@ def query_zero_entropy(question, k=50):
 
 def query_multi_strategy(question, k=20):
     """
-    Récupère des documents selon plusieurs stratégies complémentaires.
-    Agrège et déduplique les résultats.
+    Applique plusieurs stratégies de recherche complémentaires :
+    - no_filter : tous les documents
+    - is_guidelines : uniquement les recommandations
+    - citation_only : documents avec beaucoup de citations
+    Déduplique les résultats en utilisant le chemin unique de chaque document.
     """
     zclient = get_zclient()
     strategies = {
-        "no_filter": None
+        "no_filter": None,
+        "is_guidelines": {
+            "is_guidelines": { "$eq": "true" }
+        },
+        "citation_only": {
+            "$and": [
+                { "citation_count": { "$gt": "10" } },
+                { "influential_citation_count": { "$gt": "2" } }
+            ]
+        }
     }
 
     all_results = []
@@ -47,7 +69,6 @@ def query_multi_strategy(question, k=20):
 
     for label, filt in strategies.items():
         try:
-            print(f"🔎 Envoi de la requête à ZeroEntropy pour : {question} | filtre : {label}")
             response = zclient.queries.top_documents(
                 collection_name="VeraScientia-HighThroughput",
                 query=question,
