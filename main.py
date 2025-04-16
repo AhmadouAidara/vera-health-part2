@@ -9,7 +9,7 @@ from src.scoring import score_documents
 from src.selection import select_top_15
 
 
-# 2. Nettoyage des apostrophes et guillemets
+#  Nettoyage des apostrophes et guillemets
 def clean_question(text):
     """
     Nettoie les apostrophes et guillemets typographiques pour éviter 
@@ -17,7 +17,7 @@ def clean_question(text):
     """
     return text.replace("’", "'").replace("“", '"').replace("”", '"')
 
-# 3. Liste des 11 questions cliniques nettoyées
+#  Liste des 11 questions cliniques nettoyées
 RAW_QUESTIONS = [
     "Should I use beta blocker in a patient with HFpEF and grade 3 diastolic dysfunction?",
     "What test is used to confirm celiac disease in adults?",
@@ -34,7 +34,7 @@ RAW_QUESTIONS = [
 
 QUESTIONS = [clean_question(q) for q in RAW_QUESTIONS]
 
-# 4. Poids (issus de la Partie 1)
+# Poids (issus de la Partie 1)
 weights = {
     "publication_type_score":0.13099,
     "impact_factor_normalized":0.06014,
@@ -42,12 +42,12 @@ weights = {
     "recency_score":0.26443
 }
 
-# 5. Chargement des journaux
+# Chargement des journaux
 print("Chargement des journaux...")
 journal_path = "data/journals.ts"
 journals_df = load_journals(journal_path)
 
-# 6. Traitement complet par question
+# Traitement complet par question
 all_results = []
 
 for question in QUESTIONS:
@@ -75,7 +75,7 @@ for question in QUESTIONS:
         doc.metadata["question"] = question
     all_results.extend(top_15)
 
-# 7. Export final
+# Export final
 if all_results:
     df_final = pd.DataFrame([doc.metadata for doc in all_results])
     df_final.to_csv("results/top_15_papers.csv", index=False)
