@@ -1,0 +1,5 @@
+pandas
+openai
+requests
+python-dotenv
+zeroentropy==0.1.0a3
